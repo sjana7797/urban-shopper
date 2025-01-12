@@ -1,0 +1,225 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  createdProducts Product[]
+}
+
+model Customer {
+  id Int @id @default(autoincrement())
+
+  firstName String @map("first_name")
+  lastName  String @map("last_name")
+  email     String @unique @map("email")
+  phone     String @map("phone")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  carts Cart[]
+  Order Order[]
+}
+
+model Product {
+  id Int @id @default(autoincrement())
+
+  name        String
+  description String
+
+  costPrice     Float @map("cost_price")
+  sellPrice     Float @map("sell_price")
+  discountPrice Float @map("discount_price")
+
+  brandId Int
+  brand   Brand @relation(fields: [brandId], references: [id])
+
+  sales Int @default(0)
+
+  createdById Int
+  createdBy   User @relation(fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  productCategories ProductCategory[]
+  cartItems         CartItem[]
+  OrderItem         OrderItem[]
+  TransactionItem   TransactionItem[]
+}
+
+model Brand {
+  id          Int    @id @default(autoincrement())
+  name        String
+  description String
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  products Product[]
+}
+
+model Category {
+  id Int @id @default(autoincrement())
+
+  name        String
+  description String
+
+  parentId Int?
+  parent   Category? @relation(fields: [parentId], references: [id], name: "parent")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  children          Category[]        @relation("parent")
+  productCategories ProductCategory[]
+}
+
+model ProductCategory {
+  productId  Int
+  categoryId Int
+
+  product  Product  @relation(fields: [productId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
+
+  @@id([productId, categoryId])
+}
+
+model Cart {
+  id Int @id @default(autoincrement())
+
+  customerId Int
+  customer   Customer @relation(fields: [customerId], references: [id])
+
+  isDeleted Boolean @default(false) @map("is_deleted")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  cartItems CartItem[]
+}
+
+model CartItem {
+  id Int @id @default(autoincrement())
+
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+
+  quantity Int
+  price    Float
+  discount Float @default(0)
+
+  cartId Int
+  cart   Cart @relation(fields: [cartId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+}
+
+enum OrderStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+  REFUNDED
+  FAILED
+  DELIVERED
+  DISPATCHED
+}
+
+model Order {
+  id Int @id @default(autoincrement())
+
+  customerId Int
+  customer   Customer @relation(fields: [customerId], references: [id])
+
+  status OrderStatus
+
+  totalPrice    Float
+  taxPrice      Float
+  shippingPrice Float
+  discountPrice Float
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  orderItems  OrderItem[]
+  Transaction Transaction[]
+}
+
+model OrderItem {
+  id Int @id @default(autoincrement())
+
+  orderId Int
+  order   Order @relation(fields: [orderId], references: [id])
+
+  status OrderStatus
+
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Float
+  discount  Float
+  tax       Float   @default(0)
+  total     Float
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
+model Transaction {
+  id Int @id @default(autoincrement())
+
+  amount Float
+  status TransactionStatus
+
+  orderId Int
+  order   Order @relation(fields: [orderId], references: [id])
+
+  createdAt       DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime          @updatedAt @map("updated_at") @db.Timestamptz(3)
+  TransactionItem TransactionItem[]
+}
+
+model TransactionItem {
+  id Int @id @default(autoincrement())
+
+  status TransactionStatus
+
+  transactionId Int
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
+
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+
+  quantity Int
+  price    Float
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+}

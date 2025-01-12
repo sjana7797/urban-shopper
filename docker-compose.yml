@@ -1,0 +1,29 @@
+services:
+  database:
+    image: postgres:15.3-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - ./temp-data/postgres:/var/lib/postgresql/data
+    networks:
+      - urban-shopper
+
+  redis:
+    image: redis:7.0.11-alpine
+    restart: always
+    ports:
+      - 6379:6379
+    volumes:
+      - ./temp-data/redis:/data
+    networks:
+      - urban-shopper
+
+networks:
+  urban-shopper:
+    driver: bridge
+    name: urban-shopper
