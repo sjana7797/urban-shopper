@@ -15,12 +15,23 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@repo/ui/components/sidebar";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import "@repo/ui/styles/globals.css";
 
+// Create a client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchInterval: 0,
+    },
+  },
+});
+
 export const Route = createRootRoute({
   component: () => (
-    <>
+    <QueryClientProvider client={queryClient}>
       <SidebarProvider>
         <AppSidebar />
         <SidebarInset>
@@ -49,6 +60,7 @@ export const Route = createRootRoute({
       </SidebarProvider>
 
       <TanStackRouterDevtools />
-    </>
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
   ),
 });

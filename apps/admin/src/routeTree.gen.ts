@@ -18,6 +18,7 @@ import { Route as rootRoute } from './routes/__root'
 
 const IndexLazyImport = createFileRoute('/')()
 const ProductIndexLazyImport = createFileRoute('/product/')()
+const HealthIndexLazyImport = createFileRoute('/health/')()
 const ProductAddLazyImport = createFileRoute('/product/add')()
 const ProductPostIdIndexLazyImport = createFileRoute('/product/$postId/')()
 const ProductPostIdEditLazyImport = createFileRoute('/product/$postId/edit')()
@@ -35,6 +36,12 @@ const ProductIndexLazyRoute = ProductIndexLazyImport.update({
   path: '/product/',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/product/index.lazy').then((d) => d.Route))
+
+const HealthIndexLazyRoute = HealthIndexLazyImport.update({
+  id: '/health/',
+  path: '/health/',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/health/index.lazy').then((d) => d.Route))
 
 const ProductAddLazyRoute = ProductAddLazyImport.update({
   id: '/product/add',
@@ -76,6 +83,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductAddLazyImport
       parentRoute: typeof rootRoute
     }
+    '/health/': {
+      id: '/health/'
+      path: '/health'
+      fullPath: '/health'
+      preLoaderRoute: typeof HealthIndexLazyImport
+      parentRoute: typeof rootRoute
+    }
     '/product/': {
       id: '/product/'
       path: '/product'
@@ -105,6 +119,7 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
   '/product/add': typeof ProductAddLazyRoute
+  '/health': typeof HealthIndexLazyRoute
   '/product': typeof ProductIndexLazyRoute
   '/product/$postId/edit': typeof ProductPostIdEditLazyRoute
   '/product/$postId': typeof ProductPostIdIndexLazyRoute
@@ -113,6 +128,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
   '/product/add': typeof ProductAddLazyRoute
+  '/health': typeof HealthIndexLazyRoute
   '/product': typeof ProductIndexLazyRoute
   '/product/$postId/edit': typeof ProductPostIdEditLazyRoute
   '/product/$postId': typeof ProductPostIdIndexLazyRoute
@@ -122,6 +138,7 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexLazyRoute
   '/product/add': typeof ProductAddLazyRoute
+  '/health/': typeof HealthIndexLazyRoute
   '/product/': typeof ProductIndexLazyRoute
   '/product/$postId/edit': typeof ProductPostIdEditLazyRoute
   '/product/$postId/': typeof ProductPostIdIndexLazyRoute
@@ -132,6 +149,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/product/add'
+    | '/health'
     | '/product'
     | '/product/$postId/edit'
     | '/product/$postId'
@@ -139,6 +157,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/product/add'
+    | '/health'
     | '/product'
     | '/product/$postId/edit'
     | '/product/$postId'
@@ -146,6 +165,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/product/add'
+    | '/health/'
     | '/product/'
     | '/product/$postId/edit'
     | '/product/$postId/'
@@ -155,6 +175,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
   ProductAddLazyRoute: typeof ProductAddLazyRoute
+  HealthIndexLazyRoute: typeof HealthIndexLazyRoute
   ProductIndexLazyRoute: typeof ProductIndexLazyRoute
   ProductPostIdEditLazyRoute: typeof ProductPostIdEditLazyRoute
   ProductPostIdIndexLazyRoute: typeof ProductPostIdIndexLazyRoute
@@ -163,6 +184,7 @@ export interface RootRouteChildren {
 const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
   ProductAddLazyRoute: ProductAddLazyRoute,
+  HealthIndexLazyRoute: HealthIndexLazyRoute,
   ProductIndexLazyRoute: ProductIndexLazyRoute,
   ProductPostIdEditLazyRoute: ProductPostIdEditLazyRoute,
   ProductPostIdIndexLazyRoute: ProductPostIdIndexLazyRoute,
@@ -180,6 +202,7 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/product/add",
+        "/health/",
         "/product/",
         "/product/$postId/edit",
         "/product/$postId/"
@@ -190,6 +213,9 @@ export const routeTree = rootRoute
     },
     "/product/add": {
       "filePath": "product/add.lazy.tsx"
+    },
+    "/health/": {
+      "filePath": "health/index.lazy.tsx"
     },
     "/product/": {
       "filePath": "product/index.lazy.tsx"

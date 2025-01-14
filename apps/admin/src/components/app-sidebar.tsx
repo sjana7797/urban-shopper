@@ -6,10 +6,8 @@ import {
   BookOpen,
   Bot,
   Command,
-  Frame,
   GalleryVerticalEnd,
-  Map,
-  PieChart,
+  ServerCrash,
   Settings2,
   ShipWheel,
 } from "lucide-react";
@@ -133,21 +131,11 @@ const data = {
       ],
     },
   ],
-  projects: [
+  quickLinks: [
     {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
+      name: "Health Check",
+      url: "/health",
+      icon: ServerCrash,
     },
   ],
 };
@@ -160,7 +148,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        <NavProjects quickLinks={data.quickLinks} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
